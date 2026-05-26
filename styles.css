@@ -422,50 +422,73 @@ a:hover { color: var(--lime-deep); }
 
 /* =========================================================
    CAROUSEL (Gallery) - Peek / Featured pattern
-   Center slide is full-size + full-opacity, previous/next
-   slides peek in on the left and right at reduced scale.
-   Side slides stay visible (no haze), just smaller.
-   Auto-rotates every 2 seconds.
+   Absolute-positioned slides driven by CSS classes:
+     is-prev   = left peek (scale 0.82, opacity 0.7)
+     is-active = centered feature (scale 1, opacity 1, lime ring)
+     is-next   = right peek (scale 0.82, opacity 0.7)
+   All other slides are invisible (opacity 0). Auto-rotates every 2s.
    ========================================================= */
 .carousel {
   position: relative;
   margin-top: 18px;
 }
 .car-viewport {
+  position: relative;
   overflow: hidden;
   padding: 32px 0;
 }
 .car-track {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  transition: transform 0.65s cubic-bezier(0.5, 0.05, 0.2, 1);
-  will-change: transform;
+  --slide-w: 60%;
+  --prev-x: -150%;
+  --next-x: 50%;
+  --track-h: 33.75%;
+  position: relative;
+  width: 100%;
+  padding-bottom: var(--track-h);
 }
 .car-slide {
-  flex: 0 0 60%;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: var(--slide-w);
   aspect-ratio: 16 / 9;
-  background: var(--forest-dark);
+  background-color: var(--forest-dark);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   border-radius: var(--radius);
   overflow: hidden;
-  transform: scale(0.82);
-  opacity: 0.7;
   transition: transform 0.65s cubic-bezier(0.5, 0.05, 0.2, 1),
-              opacity 0.65s ease,
+              opacity 0.5s ease,
               box-shadow 0.65s ease;
+  /* Default state: centered behind active, invisible */
+  transform: translateX(-50%) scale(0.82);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
 }
+.car-slide.is-prev {
+  transform: translateX(var(--prev-x)) scale(0.82);
+  opacity: 0.7;
+  pointer-events: auto;
+  z-index: 2;
+  cursor: pointer;
+}
 .car-slide.is-active {
-  transform: scale(1);
+  transform: translateX(-50%) scale(1);
   opacity: 1;
+  pointer-events: auto;
+  z-index: 3;
   box-shadow: 0 26px 60px rgba(0, 0, 0, 0.48),
               0 0 0 4px var(--lime);
 }
-.car-slide img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+.car-slide.is-next {
+  transform: translateX(var(--next-x)) scale(0.82);
+  opacity: 0.7;
+  pointer-events: auto;
+  z-index: 2;
+  cursor: pointer;
 }
 .car-btn {
   position: absolute;
@@ -479,7 +502,7 @@ a:hover { color: var(--lime-deep); }
   border-radius: 50%;
   font-size: 1.2rem;
   cursor: pointer;
-  z-index: 3;
+  z-index: 4;
   transition: background 0.2s, transform 0.2s;
   display: flex;
   align-items: center;
@@ -840,7 +863,12 @@ a:hover { color: var(--lime-deep); }
 @media (max-width: 1100px) {
   .services-grid { grid-template-columns: repeat(2, 1fr); }
   .footer-inner { grid-template-columns: 1fr 1fr; }
-  .car-slide { flex: 0 0 72%; }
+  .car-track {
+    --slide-w: 72%;
+    --prev-x: -135%;
+    --next-x: 35%;
+    --track-h: 40.5%;
+  }
 }
 
 @media (max-width: 900px) {
@@ -870,8 +898,12 @@ a:hover { color: var(--lime-deep); }
   }
   .reviews-grid { grid-template-columns: 1fr; }
 
-  .car-slide { flex: 0 0 82%; }
-  .car-track { gap: 16px; }
+  .car-track {
+    --slide-w: 82%;
+    --prev-x: -125%;
+    --next-x: 25%;
+    --track-h: 46.125%;
+  }
 
   .mobile-call { display: block; }
   body { padding-bottom: 56px; }
@@ -888,8 +920,16 @@ a:hover { color: var(--lime-deep); }
   .car-btn { width: 40px; height: 40px; }
   .car-prev { left: 8px; }
   .car-next { right: 8px; }
-  .car-slide { flex: 0 0 88%; transform: scale(0.9); }
-  .car-track { gap: 12px; }
+  /* On small mobile, peeks become too cramped, hide them and show only the active slide */
+  .car-track {
+    --slide-w: 92%;
+    --track-h: 51.75%;
+  }
+  .car-slide.is-prev,
+  .car-slide.is-next {
+    opacity: 0;
+    pointer-events: none;
+  }
   .hero-cta { flex-direction: column; align-items: stretch; }
   .cta-actions { flex-direction: column; }
   .cta-trust { grid-template-columns: 1fr; gap: 22px; padding-top: 28px; }
