@@ -2,33 +2,66 @@
    TREE OF LIFE TREE SERVICES - script.js
    Three independent modules (each in its own IIFE so a failure
    in one cannot break the others):
-     1. Hamburger menu
-     2. Gallery carousel (class-driven peek pattern, 2s auto)
+     1. Premium hamburger menu (slide-in panel + backdrop + scroll lock)
+     2. Gallery carousel (5-state class-driven peek pattern, 2s auto)
      3. Nav scroll state
    ========================================================= */
 
 'use strict';
 
-/* ===== 1. HAMBURGER ===== */
+/* ===== 1. HAMBURGER MENU ===== */
 (function () {
   var hamburger = document.getElementById('hamburger');
   var navLinks = document.getElementById('navLinks');
+  var backdrop = document.getElementById('navBackdrop');
   if (!hamburger || !navLinks) return;
 
-  hamburger.addEventListener('click', function () {
-    navLinks.classList.toggle('is-open');
-  });
+  function openMenu() {
+    hamburger.classList.add('is-open');
+    navLinks.classList.add('is-open');
+    if (backdrop) backdrop.classList.add('is-open');
+    document.body.classList.add('nav-open');
+    hamburger.setAttribute('aria-expanded', 'true');
+  }
+  function closeMenu() {
+    hamburger.classList.remove('is-open');
+    navLinks.classList.remove('is-open');
+    if (backdrop) backdrop.classList.remove('is-open');
+    document.body.classList.remove('nav-open');
+    hamburger.setAttribute('aria-expanded', 'false');
+  }
+  function toggleMenu() {
+    if (navLinks.classList.contains('is-open')) closeMenu();
+    else openMenu();
+  }
+
+  hamburger.addEventListener('click', toggleMenu);
+  if (backdrop) backdrop.addEventListener('click', closeMenu);
+
+  /* Close menu when a nav link is clicked */
   navLinks.querySelectorAll('a').forEach(function (a) {
-    a.addEventListener('click', function () {
-      navLinks.classList.remove('is-open');
-    });
+    a.addEventListener('click', closeMenu);
+  });
+
+  /* Close menu on ESC */
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && navLinks.classList.contains('is-open')) closeMenu();
+  });
+
+  /* Close menu if user resizes back to desktop */
+  window.addEventListener('resize', function () {
+    if (window.innerWidth > 900 && navLinks.classList.contains('is-open')) closeMenu();
   });
 })();
 
 /* ===== 2. GALLERY CAROUSEL =====
-   No pixel math, no flex layout. CSS handles all positioning
-   via three classes: is-prev / is-active / is-next. JS only
-   toggles which slide gets which class.
+   5-state class system for clean linear right-to-left motion:
+     is-far-left   = exiting off-screen left (opacity 0)
+     is-prev       = left peek (opacity 0.7, scale 0.82)
+     is-active     = center feature (opacity 1, scale 1, lime ring)
+     is-next       = right peek (opacity 0.7, scale 0.82)
+     is-far-right  = staged off-screen right (opacity 0)
+   Slides cycle through these positions linearly.
 */
 (function () {
   var carousel = document.getElementById('carousel');
@@ -43,6 +76,7 @@
   var current = 0;
   var autoInterval = null;
   var ROTATE_MS = 2000;
+  var half = Math.floor(total / 2);
 
   /* ---- build pagination dots ---- */
   for (var i = 0; i < total; i++) {
@@ -58,16 +92,16 @@
     dotsWrap.appendChild(dot);
   }
 
-  /* ---- core update: just toggle classes ---- */
+  /* ---- core update: assign one of 5 classes by relative index ---- */
   function update() {
-    var prevIdx = (current - 1 + total) % total;
-    var nextIdx = (current + 1) % total;
-
     slides.forEach(function (slide, idx) {
-      slide.classList.remove('is-prev', 'is-active', 'is-next');
-      if (idx === current) slide.classList.add('is-active');
-      else if (idx === prevIdx) slide.classList.add('is-prev');
-      else if (idx === nextIdx) slide.classList.add('is-next');
+      var rel = (idx - current + total) % total;
+      slide.classList.remove('is-far-left', 'is-prev', 'is-active', 'is-next', 'is-far-right');
+      if (rel === 0) slide.classList.add('is-active');
+      else if (rel === 1) slide.classList.add('is-next');
+      else if (rel === total - 1) slide.classList.add('is-prev');
+      else if (rel <= half) slide.classList.add('is-far-right');
+      else slide.classList.add('is-far-left');
     });
 
     dotsWrap.querySelectorAll('.car-dot').forEach(function (d, idx) {
