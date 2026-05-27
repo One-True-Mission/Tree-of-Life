@@ -75,27 +75,31 @@ a:hover { color: var(--lime-deep); }
 .site-nav {
   position: fixed;
   top: 0; left: 0; right: 0;
-  background: rgba(8, 38, 15, 0.94);
-  border-bottom: 1px solid rgba(165, 214, 58, 0.3);
+  background: rgba(244, 234, 216, 0.97);
+  border-bottom: 1px solid rgba(8, 38, 15, 0.14);
   z-index: 250;
 }
 .nav-inner {
   max-width: var(--max);
   margin: 0 auto;
-  padding: 16px 24px;
+  padding: 6px 24px;
   display: flex;
   align-items: center;
   gap: 24px;
 }
 .brand {
-  font-family: 'Bebas Neue', sans-serif;
-  color: var(--paper);
-  line-height: 1;
-  letter-spacing: 0.04em;
   margin-right: auto;
+  display: flex;
+  align-items: center;
 }
-.brand-mark { display: block; font-size: 1.5rem; }
-.brand-sub { display: block; font-size: 0.78rem; color: var(--lime); letter-spacing: 0.18em; margin-top: 3px; font-style: italic; font-family: 'Rajdhani', sans-serif; }
+.brand-logo {
+  height: 60px;
+  width: auto;
+  display: block;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.18));
+  transition: transform 0.25s ease;
+}
+.brand:hover .brand-logo { transform: scale(1.04); }
 .nav-links {
   display: flex;
   gap: 28px;
@@ -103,14 +107,14 @@ a:hover { color: var(--lime-deep); }
 }
 .nav-links a {
   font-family: 'Rajdhani', sans-serif;
-  color: var(--paper);
+  color: var(--ink);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 0.92rem;
   transition: color 0.2s;
 }
-.nav-links a:hover { color: var(--lime); }
+.nav-links a:hover { color: var(--forest-mid); }
 .nav-cta {
   background: var(--lime);
   color: var(--forest-darkest);
@@ -139,7 +143,7 @@ a:hover { color: var(--lime-deep); }
   left: 11px;
   width: 26px;
   height: 2.5px;
-  background: var(--lime);
+  background: var(--forest-darkest);
   border-radius: 2px;
   transition: top 0.3s cubic-bezier(0.5, 0, 0.2, 1),
               transform 0.3s cubic-bezier(0.5, 0, 0.2, 1),
@@ -909,9 +913,18 @@ a:hover { color: var(--lime-deep); }
 }
 
 @media (max-width: 900px) {
-  .hamburger { display: block; }
+  .hamburger { display: block; order: -1; }
   .nav-cta { display: none; }
   .nav-links { display: none; }
+
+  /* Mobile nav layout: hamburger left, logo centered */
+  .brand {
+    margin-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    transform: translateX(-24px); /* visually compensate for hamburger width so logo reads truly centered */
+  }
+  .brand-logo { height: 52px; }
 
   .mobile-menu {
     display: flex;
