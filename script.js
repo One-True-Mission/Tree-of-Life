@@ -12,45 +12,47 @@
 /* ===== 1. HAMBURGER MENU ===== */
 (function () {
   var hamburger = document.getElementById('hamburger');
-  var navLinks = document.getElementById('navLinks');
+  var mobileMenu = document.getElementById('mobileMenu');
   var backdrop = document.getElementById('navBackdrop');
-  if (!hamburger || !navLinks) return;
+  if (!hamburger || !mobileMenu) return;
 
   function openMenu() {
     hamburger.classList.add('is-open');
-    navLinks.classList.add('is-open');
+    mobileMenu.classList.add('is-open');
     if (backdrop) backdrop.classList.add('is-open');
     document.body.classList.add('nav-open');
     hamburger.setAttribute('aria-expanded', 'true');
+    mobileMenu.setAttribute('aria-hidden', 'false');
   }
   function closeMenu() {
     hamburger.classList.remove('is-open');
-    navLinks.classList.remove('is-open');
+    mobileMenu.classList.remove('is-open');
     if (backdrop) backdrop.classList.remove('is-open');
     document.body.classList.remove('nav-open');
     hamburger.setAttribute('aria-expanded', 'false');
+    mobileMenu.setAttribute('aria-hidden', 'true');
   }
   function toggleMenu() {
-    if (navLinks.classList.contains('is-open')) closeMenu();
+    if (mobileMenu.classList.contains('is-open')) closeMenu();
     else openMenu();
   }
 
   hamburger.addEventListener('click', toggleMenu);
   if (backdrop) backdrop.addEventListener('click', closeMenu);
 
-  /* Close menu when a nav link is clicked */
-  navLinks.querySelectorAll('a').forEach(function (a) {
+  /* Close menu when a mobile menu link or CTA is clicked */
+  mobileMenu.querySelectorAll('a').forEach(function (a) {
     a.addEventListener('click', closeMenu);
   });
 
   /* Close menu on ESC */
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && navLinks.classList.contains('is-open')) closeMenu();
+    if (e.key === 'Escape' && mobileMenu.classList.contains('is-open')) closeMenu();
   });
 
   /* Close menu if user resizes back to desktop */
   window.addEventListener('resize', function () {
-    if (window.innerWidth > 900 && navLinks.classList.contains('is-open')) closeMenu();
+    if (window.innerWidth > 900 && mobileMenu.classList.contains('is-open')) closeMenu();
   });
 })();
 
